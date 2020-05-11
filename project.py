@@ -127,19 +127,21 @@ Name:\t\t {self.name}
         
 
     def initialise_github(self):
-        github = os.popen(f"gh repo create {self.repo_name}").read()
 
-        print(github.find("graphql error"))
-        if github.find("graphql error: 'Name already exists on this account'") > -1:
+        process = subprocess.run(f"gh repo create {self.repo_name}", shell=True, capture_output=True)
+        stderr = process.stderr.decode('utf-8')
+        stdout = process.stdout.decode('utf-8')
+
+        if stderr.find("graphql error: 'Name already exists on this account'") > -1:
             print(f"You already have an existing GitHub repo with the name {self.name}")
             print("Enter a different repo name or leave blank to continue without connecting to GitHub.")
             response = input("Repository name: ")
             if not response == "":
                 self.repo_name = response
-                initialise_github(self)
-        else:
-            self.repo_name = github.replace("\n", "")
-        print(self.repo_name)
+                self.initialise_github()
+        elif process.returncode == 0:
+            self.repo_name = stdout.replace("\n", "")
+
     
 
     def create_readme(self):
