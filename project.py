@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-import frameworks, parse_args, functions
+try:
+    import frameworks, parse_args, functions
+except ImportError:
+    print("Error importing modules. Add custom module directory to path")
 
 import os, sys, re
 
@@ -58,7 +61,7 @@ Name:\t\t {self.name}
         
 
     def initialise_git(self, branch='master'):
-    
+        #TODO: refactor to use git-flow cli tool
         stdout, stderr, returncode = functions.run_process("git init")
 
         if returncode == 0:
