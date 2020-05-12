@@ -1,34 +1,53 @@
 #!/usr/bin/env python3
-import argparse
+import argparse, functions
 import frameworks
 import project as base
 
-def create_project(project):
-    pass
+def create_project(project_class, args):
+    project = project_class(args.projectname)
+    #project.initialise()
+    return project
+
+def create_environment(project, framework):
+
+    project.initialise_environment()
+
+    if not framework == None:
+        project.initialise_framework()
+
+    return project
+
 
 def create_base_project(args):
     print(f'creating project')
-    project = base.Project(args.projectname)
-    #project.initialise()
+    project = create_project(base.Project, args)
+    
     
 def create_javascript_project(args):
     print('creating javascript project')
 
 def create_python_project(args):
-    """TODO: select class based on dictionary"""
+
     print('creating python project')
-    #for key in python.__dict__:
-    #    print(f"{key} = {python.__dict__[key]}")
 
     framework = args.framework
-    if framework == None:
-        project = frameworks.python.PythonProject()
-    elif framework == "flask":
-        project = frameworks.python.FlaskProject()
-    elif framework == "django":
-        project = frameworks.python.DjangoProject()
+    framework = "python" if framework == None else framework
 
-    #project.initialise()
+    supported_frameworks = functions.get_supported_frameworks(frameworks)
+
+    if f"python.{framework}" in supported_frameworks:
+        project = create_project(supported_frameworks[f"python.{framework}"]['class'], args)
+
+    else:
+        print(f"framework {framework} not found.")
+    
+    framework = None if framework == 'python' else framework
+
+    project = create_environment(project, framework)
+
+    
+
+
 
 def git_function(args):
     print('git commands')
