@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-import argparse, functions
-import frameworks
+import argparse
+import frameworks, functions
 import project as base
 
 def create_project(project_class, args):
+    print(f"Initialising new {project_class.label} project")
     project = project_class(args.projectname)
-    #project.initialise()
+    project.initialise()
     return project
 
 def create_environment(project, framework):
@@ -26,9 +27,8 @@ def create_base_project(args):
 def create_javascript_project(args):
     print('creating javascript project')
 
-def create_python_project(args):
 
-    print('creating python project')
+def create_python_project(args):
 
     framework = args.framework
     framework = "python" if framework == None else framework
@@ -44,8 +44,6 @@ def create_python_project(args):
     framework = None if framework == 'python' else framework
 
     project = create_environment(project, framework)
-
-    
 
 
 
