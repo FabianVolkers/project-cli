@@ -100,7 +100,18 @@ def parse_arguments(argv, frameworks):
 
 
     """TODO: refactor this function. Maybe generate parsers and arguments based on dicts?"""
-    parser = argparse.ArgumentParser(description='Project Creation and Management Tool.')
+    #frameworks = functions.get_supported_frameworks(frameworks)
+    framework_str = ""
+    for framework in frameworks:
+        framework_str += f"{framework.split('.')[1]}, "
+
+    epilog = f"""
+
+Supported Frameworks:
+{framework_str}
+
+"""
+    parser = argparse.ArgumentParser(description="Project Creation and Management Tool.", epilog=epilog)
     subparsers = parser.add_subparsers(help='sub-command help')
 
     create_parser = subparsers.add_parser('create', help='create new projects')
