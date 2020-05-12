@@ -1,128 +1,10 @@
 #!/usr/bin/env python3
 
-import frameworks, parse_args
+import frameworks, parse_args, functions
 
 import os, sys, argparse, subprocess, inspect, re
 
 """TODO: refactor every command to use subprocess"""
-"""TODO: refactor functions into own file"""
-
-
-def get_supported_frameworks():
-    supported_frameworks = {}
-    imports = inspect.getmembers(frameworks)
-    for name, module in imports:
-        if inspect.ismodule(module):
-            for class_name, class_obj in inspect.getmembers(module):
-                if inspect.isclass(class_obj):
-                    #print(class_obj, str(class_obj) ==  str(Project).replace("__main__", "project"))
-                    language_name = name
-                    create_func = f"create_{language_name}_project"
-
-                    if str(class_obj) == str(Project).replace("__main__", "project"):
-                        language_name = "nolang"
-                        create_func = "create_base_project"
-
-                    if not hasattr(supported_frameworks, f"{language_name}.{class_obj.label}"):
-                        supported_frameworks[f"{language_name}.{class_obj.label}"] = {
-                            "class": class_obj,
-                            "lang": language_name,
-                            "create_func": getattr(parse_args, create_func)
-                        }
-                    
-    return supported_frameworks
-    
-
-def confirm_action(response):
-    if response == "y" or response == "yes":
-        return True
-
-    elif response == "n" or response == "no":
-        return False
-    else:
-        response = input("Please type y or n\n")
-        return confirm_action(response)
-
-def check_full_path(path):
-    if len(path) == 0 or not path[0] == "/":
-        print("Please specify the full path of your project directory")
-        path = input("Path: ")
-        return check_full_path(path)
-    else:
-        if path[len(path)-1] == "/":
-            path = path[:len(path)-1]
-
-        return path
-
-def confirm_option(response, nOptions):
-    try:
-        response = int(response)
-    except ValueError:
-        response = input(f'Please chose one of the options between 1 and {nOptions}')
-        return confirm_option(response, nOptions)
-    finally:
-        if response > 0 and response <= nOptions:
-            return response
-        else:
-            response = input(f'Please chose one of the options between 1 and {nOptions}')
-            return confirm_option(response, nOptions)
-
-def set_default_dev_dir():
-    print("Default dev dir environment variable not set.")
-    print("Please specify a default project parent directory in which to put all project directories.")
-    
-    dev_dir = input('Path: ')
-    dev_dir = check_full_path(dev_dir)
-
-    response = input('Do you want to store the default path in your environment variables? y|n:')
-    store_env_var = confirm_action(response)
-
-    if store_env_var:
-        home = os.popen("echo $HOME").read()
-        temp = os.popen("echo $SHELL").read()
-        temp = temp.split("/")
-        shell = temp[len(temp)-1].replace("\n", "")
-        command = f'echo "\ \n \ \n# Project cli tool\ \nexport PROJECT_DEV_DIR={dev_dir}" >> "$HOME/.{shell}rc"'
-        #print(command)
-        os.system(command)
-        os.system(f"source $HOME/.{shell}rc")
-
-    return dev_dir
-
-
-def get_dev_dir():
-    try:
-        dev_dir = os.environ['PROJECT_DEV_DIR']
-    except KeyError:
-        dev_dir = set_default_dev_dir()
-    
-    return dev_dir
-
-def validate_name(name, dev_dir):
-    existing_dirs = os.listdir(dev_dir)
-    path = dev_dir
-    if name in existing_dirs:
-        print(f"The directory {dev_dir}/{name} already exists.")
-        response = input("""Do you want to change
-[1] The project name
-[2] The project path
-"""
-        )
-        response = confirm_option(response, 2)
-        if response == 1:
-            name, path = validate_name(input('Please enter a new project name: '), dev_dir)
-        elif response == 2:
-            name, path = validate_name(name, input('Please specify a different parent directory for the new project directory: '))
-
-    return name, path
-
-
-def run_process(command):
-    process = subprocess.run(command, shell=True, capture_output=True)
-    stderr = process.stderr.decode('utf-8')
-    stdout = process.stdout.decode('utf-8')
-    return stdout, stderr, process.returncode
-
 
 class Meta(type):
     def __new__(cls, name, bases, dct):
@@ -151,8 +33,8 @@ class Project(metaclass=Meta):
 Name:\t\t {self.name}
 """
     def initialise(self):
-        dev_dir = get_dev_dir()
-        self.name, dev_dir = validate_name(self.name, dev_dir)
+        dev_dir = functions.get_dev_dir()
+        self.name, dev_dir = functions.validate_name(self.name, dev_dir)
         self.create_dir(dev_dir)
         self.initialise_git()
         self.initialise_github()
@@ -187,7 +69,7 @@ Name:\t\t {self.name}
 
     def initialise_github(self, remote='origin'):
 
-        stdout, stderr, returncode = run_process(f"gh repo create {self.repo_name}")
+        stdout, stderr, returncode = functions.run_process(f"gh repo create {self.repo_name}")
 
         if returncode == 0:
             self.repo_name = stdout.replace("\n", "")
@@ -204,13 +86,13 @@ Name:\t\t {self.name}
             print(stderr)
     
     def push_file_to_remote(self, filename):
-        stdout, stderr, returncode = run_process(f"git add {filename}")
+        stdout, stderr, returncode = functions.run_process(f"git add {filename}")
         if returncode == 0:
             print(stdout)
-            stdout, stderr, returncode = run_process(f"git commit -m '[project cli] generate readme'")
+            stdout, stderr, returncode = functions.run_process(f"git commit -m '[project cli] generate readme'")
             if returncode == 0:
                 print(stdout)
-                stdout, stderr, returncode = run_process(f"git push {self.remote} {self.branch}")
+                stdout, stderr, returncode = functions.run_process(f"git push {self.remote} {self.branch}")
                 if returncode == 0:
                     print(stdout)
                 else:
@@ -252,7 +134,7 @@ This readme was generated by the project cli tool.
 
 if __name__ == "__main__":
     try:
-        supported_frameworks = get_supported_frameworks()
+        supported_frameworks = functions.get_supported_frameworks(frameworks)
         arguments = parse_args.parse_arguments(sys.argv[1:], supported_frameworks)
         arguments.func(arguments)
     except KeyboardInterrupt:
