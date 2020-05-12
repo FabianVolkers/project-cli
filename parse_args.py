@@ -3,6 +3,8 @@ import argparse
 import frameworks, functions
 import project as base
 
+#TODO: refactor standalone functions back into project.py
+
 def create_project(project_class, args):
     print(f"Initialising new {project_class.label} project")
     project = project_class(args.projectname)

@@ -8,6 +8,7 @@ A Command line tool for initialising and managing development projects.
 - [Features](#features)
     - [Support for Languageless, Python (Flask) and Javascript projects.](#support-for-languageless-python-flask-and-javascript-projects)
     - [Project initialisation including supported frameworks.](#project-initialisation-including-supported-frameworks)
+    - [git and github initialisation](#git-and-github-initialisation)
     - [Readme generation.](#readme-generation)
     - [coming soon:](#coming-soon)
 - [Usage](#usage)
@@ -20,6 +21,8 @@ Initialise new development projects with support for multiple frameworks and lan
 #### Support for Languageless, Python (Flask) and Javascript projects.
 
 #### Project initialisation including supported frameworks.
+
+#### git and github initialisation
 
 #### Readme generation.
 
