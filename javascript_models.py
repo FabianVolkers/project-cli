@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
 from project import Project
 import os, sys, subprocess
 
 class JavaScriptProject(Project):
     def __init__(self, name, language, framework):
         super().__init__(name, language, framework)
+
 
 class NodeJSProject(JavaScriptProject):
     def __init__(self, name, language, framework):
@@ -25,3 +27,4 @@ class NodeJSProject(JavaScriptProject):
 class VueJSProject(NodeJSProject):
     def __init__(self, name, language, framework):
         super().__init__(name, language, framework)
+    

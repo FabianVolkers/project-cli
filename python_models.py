@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from project import Project
 import os, sys, subprocess
 
@@ -6,6 +7,7 @@ class PythonProject(Project):
         super().__init__(name)
         self.language = 'python'
         self.version = version
+
 
     def initialise_environment(self):
         os.system("python3 -m venv venv")
@@ -23,6 +25,7 @@ class FlaskProject(PythonProject):
     def __init__(self, name, language, version=3):
         super().__init__(name, version)
         self.framework = 'flask'
+
 
     def initialise_framework(self):
         os.system("pip install flask")
