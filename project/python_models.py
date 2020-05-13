@@ -4,6 +4,7 @@
 #import project.project.Project
 import project.models as models
 import project.functions as functions
+import project.template as template
 import os, sys, subprocess
 
 class PythonProject(models.Project):
@@ -11,6 +12,7 @@ class PythonProject(models.Project):
         super().__init__(name)
         self.language = 'python'
         self.version = version
+        self.framework = "python"
 
 
     def initialise_environment(self):
@@ -27,48 +29,26 @@ class PythonProject(models.Project):
             print(stderr)
 
     def initialise_structure(self):
-        self.initialise_module()
-        self.initialise_docs()
-        self.initialise_tests()
-        
+        filenames = {
+            "module": ["__init__.py", f"{self.name}.py"],
+            "docs": ["conf.py"],
+            "tests": ["context.py", "test_basic.py", "test_advanced.py"]
+        }
+        for section in filenames:
+            if section == "module":
+                path = f"{self.path}/{self.name}"
+            else:
+                path = f"{self.path}/{section}"
+                
+            setattr(self, section, path)
 
-    def initialise_module(self):
-        self.module = f"{self.path}/{self.name}"
-        os.mkdir(self.module)
+            os.mkdir(path)
+            files = filenames[section]
+            for filename in files:
+                functions.create_file_from_template(
+                    f"{path}/{filename}", self, filename
+                    )
 
-        functions.create_file(f"{self.module}/__init__.py", f"from .{self.name} import main")
-
-        main = f"""
-def main():
-    print("Hello, World!)
-    return True
-"""
-        functions.create_file(f"{self.module}/{self.name}.py", main)
-
-
-    def initialise_docs(self):
-        # TODO: Docs generation
-        self.docs = f"{self.path}/docs"
-        os.mkdir(self.docs)
-        open(f"{self.docs}/conf.py", "w").close()
-
-
-    def initialise_tests(self):
-        self.tests = f"{self.path}/tests"
-        os.mkdir(self.tests)
-
-        context = f"""
-import os
-import sys
-sys.path.insert(0, os.path.abspath('..'))
-
-from ...{self.name} import {self.name}
-"""
-        functions.create_file(f"{self.tests}/context.py", context)
-
-        tests = f"from .context import {self.name}"
-        functions.create_file(f"{self.tests}/test_basic.py", tests)
-        functions.create_file(f"{self.tests}/test_advanced.py", tests)
 
     def create_requirements(self):
         

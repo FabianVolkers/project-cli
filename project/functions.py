@@ -2,6 +2,7 @@
 import os, sys, subprocess, inspect, re
 import project.commands as commands
 import project.models as models
+import project.template as template
 
 """TODO: refactor every command to use subprocess"""
 def get_supported_frameworks(frameworks):
@@ -131,3 +132,9 @@ def create_file(path, content, overwrite=False):
         print(f"If you would like to manually change the file, add this to {path}")
         print(content)
         return False
+
+def create_file_from_template(path, project, template_name):
+    if template_name == f"{project.name}.py":
+        template_name = "main.py"
+    content = template.render_template(template_name, project)
+    return create_file(path, content)
