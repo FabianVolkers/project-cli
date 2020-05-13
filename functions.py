@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os, sys, subprocess, inspect, re
-import parse_args
+import commands
 import project as base
 
 """TODO: refactor every command to use subprocess"""
@@ -23,7 +23,7 @@ def get_supported_frameworks(frameworks):
                         supported_frameworks[f"{language_name}.{class_obj.label}"] = {
                             "class": class_obj,
                             "lang": language_name,
-                            "create_func": getattr(parse_args, create_func)
+                            "create_func": getattr(commands, create_func)
                         }
                     
     return supported_frameworks
