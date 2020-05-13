@@ -1,62 +1,9 @@
 #!/usr/bin/env python3
 import argparse
-import frameworks, functions
+import frameworks, functions, commands
 import project as base
 
-#TODO: refactor standalone functions back into project.py
 
-def create_project(project_class, args):
-    print(f"Initialising new {project_class.label} project")
-    project = project_class(args.projectname)
-    project.initialise()
-    return project
-
-def create_environment(project, framework):
-
-    project.initialise_environment()
-
-    if not framework == None:
-        project.initialise_framework()
-
-    return project
-
-
-def create_base_project(args):
-    print(f'creating project')
-    project = create_project(base.Project, args)
-    
-    
-def create_javascript_project(args):
-    print('creating javascript project')
-
-
-def create_python_project(args):
-
-    framework = args.framework
-    framework = "python" if framework == None else framework
-
-    supported_frameworks = functions.get_supported_frameworks(frameworks)
-
-    if f"python.{framework}" in supported_frameworks:
-        project = create_project(supported_frameworks[f"python.{framework}"]['class'], args)
-
-    else:
-        print(f"framework {framework} not found.")
-    
-    framework = None if framework == 'python' else framework
-
-    project = create_environment(project, framework)
-
-
-
-def git_function(args):
-    print('git commands')
-
-def readme_function(args):
-    print('readme command')
-
-def requirements_function(args):
-    print('requirements command')
 
 def add_language_subparser(frameworks, subparser):
     supported_languages = []
@@ -91,11 +38,11 @@ def add_documentation_subparser(subparsers):
     readme_parser = subparsers.add_parser('readme', help='readme related commands')
     readme_parser.add_argument('command', type=str, choices=['create', 'show', 'update'])
     readme_parser.add_argument('-g', '--git', nargs=2, type=str, help='Push updated README to git remote', metavar=('remote', 'branch'))
-    readme_parser.set_defaults(func=readme_function)
+    readme_parser.set_defaults(func=commands.readme_function)
 
     requirements_parser = subparsers.add_parser('requirements', help='requirements commands')
     requirements_parser.add_argument('command', type=str, choices=['create', 'show', 'update'])
-    requirements_parser.set_defaults(func=requirements_function)
+    requirements_parser.set_defaults(func=commands.requirements_function)
     
 
 def parse_arguments(argv, frameworks):
@@ -119,7 +66,7 @@ Supported Frameworks:
     create_parser = subparsers.add_parser('create', help='create new projects')
     create_subparser = create_parser.add_subparsers(help='create sub-command help')
     create_parser.add_argument('projectname', type=str)
-    create_parser.set_defaults(func=create_base_project)
+    create_parser.set_defaults(func=commands.create_base_project)
     
     add_language_subparser(frameworks, create_subparser)
 
@@ -127,7 +74,7 @@ Supported Frameworks:
 
     git_parser = subparsers.add_parser('git', help='git related commands')
     git_parser.add_argument('command', type=str, choices=['status', 'push'])
-    git_parser.set_defaults(func=git_function)
+    git_parser.set_defaults(func=commands.git_function)
 
     namespace = parser.parse_args(argv) 
     print(namespace)
