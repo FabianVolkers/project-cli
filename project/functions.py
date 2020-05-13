@@ -119,12 +119,15 @@ def run_process(command):
     stdout = process.stdout.decode('utf-8')
     return stdout, stderr, process.returncode
 
-def create_file(path, content):
+def create_file(path, content, overwrite=False):
+    mode = "w" if overwrite else "x"
     try:
-        with open(path, "w") as file:
+        with open(path, mode) as file:
             file.write(content)
             file.close()
         return True
-    except:
-        print("error creating file")
+    except FileExistsError:
+        print(f"File {path} already exists, not overwriting")
+        print(f"If you would like to manually change the file, add this to {path}")
+        print(content)
         return False
