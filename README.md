@@ -1,7 +1,7 @@
 
 # Project CLI <!-- omit in TOC -->
 
-A Command line tool for initialising and managing development projects.
+A Command line tool for initialising and managing development projects. Also some basic code generation.
 
 ## Contents <!-- omit in TOC -->
 - [Overview](#overview)
@@ -31,6 +31,8 @@ Initialise new development projects with support for multiple frameworks and lan
 - importing existing project
 - git-flow enforcement
 - Improved readme generation
+- Django support (incl. rest framework)
+- Django Rest Framework code generation
 
 
 ## Usage
