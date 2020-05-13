@@ -23,6 +23,8 @@ class PythonProject(Project):
         else:
             print(stderr)
     
+
+    
     def create_requirements(self):
         
         pip_freeze_command = f"{self.pip} freeze"
@@ -43,7 +45,7 @@ class FlaskProject(PythonProject):
 
 
     def initialise_framework(self):
-        install_flask_command = f"{self.pip} install flask"
+        install_flask_command = f"{self.pip} install flask python-dotenv"
         stdout, stderr, returncode = functions.run_process(install_flask_command)
         if returncode == 0:
             #print(install_flask_command)
@@ -51,9 +53,14 @@ class FlaskProject(PythonProject):
             print(lines[len(lines)-2])
 
             self.initialise_app()
+
+
         else:
             print(stderr)
     
+
+
+
     def initialise_app(self):
         self.app = "app"
         self.routes = "routes"
@@ -64,20 +71,17 @@ class FlaskProject(PythonProject):
             self.create_app()
             self.create_routes()
             self.create_main()
+
+            # Save FLASK_APP in .flaskenv
+            with open(f"{self.path}/.flaskenv", "x") as file:
+                file.write(f"FLASK_APP={self.name}.py")
+                file.close()
+
             print("Successfully generated flask project.\n")
             print("To activate the virtual environment run:\n")
             print(f"cd {self.path} && source {self.env}/bin/activate")
-            print("To set the FLASK_APP environment variable run:\n")
-            print(f"export FLASK_APP={self.name}.py\n")
             print("To start the development server, run:\n")
             print("flask run")
-            #stdout, stderr, returncodeself.nname = functions.run_process()
-            #os.environ['FLASK_APP'] = f"{self.name}.py"
-
-            #process = subprocess.check_output(["flask", "run"], shell=True)
-            #out, err = process.communicate(timeout=15)
-            #print(out, err)
-            #print(process)
 
 
     
@@ -128,3 +132,9 @@ from {self.app} import app
             print(f"created {path}")
         except FileExistsError:
             print(f"{path} already exists, not overwriting.")
+
+
+
+class DjangoProject(PythonProject):
+    def __init__(self, name, version=3):
+        super().__init__(name, version=version)
