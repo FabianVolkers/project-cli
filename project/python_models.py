@@ -32,10 +32,19 @@ class PythonProject(Project):
     def initialise_module(self):
         self.module = f"{self.path}/{self.name}"
         os.mkdir(self.module)
-        open(f"{self.module}/__init__.py", "w").close()
-        open(f"{self.module}/{self.name}.py", "w").close()
+
+        functions.create_file(f"{self.module}/__init__.py", f"from .{self.name} import main")
+
+        main = f"""
+def main():
+    print("Hello, World!)
+    return True
+"""
+        functions.create_file(f"{self.module}/{self.name}.py", main)
+
 
     def initialise_docs(self):
+        # TODO: Docs generation
         self.docs = f"{self.path}/docs"
         os.mkdir(self.docs)
         open(f"{self.docs}/conf.py", "w").close()
@@ -65,8 +74,8 @@ from ...{self.name} import {self.name}
         if returncode == 0:
             print(pip_freeze_command)
             self.requirements = stdout
-        with open('requirements.txt', "w") as requirements_file:
-            requirements_file.write(self.requirements)
+            functions.create_file(f"{self.path}/requirements.txt", self.requirements)
+
 
     def install_packages(self, packages):
         install_cmd = f"{self.pip} install {packages.join(' ')}"
@@ -115,9 +124,8 @@ class FlaskProject(PythonProject):
             self.create_main()
 
             # Save FLASK_APP in .flaskenv
-            with open(f"{self.path}/.flaskenv", "x") as file:
-                file.write(f"FLASK_APP={self.name}.py")
-                file.close()
+            functions.create_file(f"{self.path}/.flaskenv", f"FLASK_APP={self.name}.py")
+
 
             print("Successfully generated flask project.\n")
             print(f"Stored environment variable FLASK_APP={self.name}.py in {self.path}/.flaskenv\n")
@@ -130,26 +138,19 @@ class FlaskProject(PythonProject):
     
     def create_app(self):
         path = f"{self.app_dir}/__init__.py"
-        try:
-            with open(path, 'x') as file:
-                content = f"""
+        content = f"""
 from flask import Flask
 
 app = Flask(__name__)
 
 from {self.app} import {self.routes}
 """
-                file.write(content)
-                file.close()
-            print(f"created {path}")
-        except FileExistsError:
-            print(f"{path} already exists, not overwriting.")
+        functions.create_file(path, content)
+
     
     def create_routes(self):
         path = f"{self.app_dir}/{self.routes}.py"
-        try:
-            with open(path, "x") as file:
-                content = f"""
+        content = f"""
 from {self.app} import app
 
 @app.route('/')
@@ -157,24 +158,16 @@ from {self.app} import app
 def index():
     return "Hello, World!"
 """
-                file.write(content)
-                file.close()
-            print(f"created {path}")        
-        except FileExistsError:
-            print(f"{path} already exists, not overwriting.")
+        functions.create_file(path, content)
+
 
     def create_main(self):
         path = f"{self.path}/{self.name}.py"
-        try:
-            with open(path, "x") as file:
-                content = f"""
+        content = f"""
 from {self.app} import app
 """
-                file.write(content)
-                file.close()
-            print(f"created {path}")
-        except FileExistsError:
-            print(f"{path} already exists, not overwriting.")
+        functions.create_file(path, content)
+
 
 
 
