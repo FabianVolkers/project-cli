@@ -43,6 +43,7 @@ def create_python_project(args):
     framework = None if framework == 'python' else framework
 
     project = create_environment(project, framework)
+    project.initialise_structure()
 
 
 

@@ -22,9 +22,42 @@ class PythonProject(Project):
 
         else:
             print(stderr)
-    
 
-    
+    def initialise_structure(self):
+        self.initialise_module()
+        self.initialise_docs()
+        self.initialise_tests()
+        
+
+    def initialise_module(self):
+        self.module = f"{self.path}/{self.name}"
+        os.mkdir(self.module)
+        open(f"{self.module}/__init__.py", "w").close()
+        open(f"{self.module}/{self.name}.py", "w").close()
+
+    def initialise_docs(self):
+        self.docs = f"{self.path}/docs"
+        os.mkdir(self.docs)
+        open(f"{self.docs}/conf.py", "w").close()
+
+
+    def initialise_tests(self):
+        self.tests = f"{self.path}/tests"
+        os.mkdir(self.tests)
+
+        context = f"""
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
+from ...{self.name} import {self.name}
+"""
+        functions.create_file(f"{self.tests}/context.py", context)
+
+        tests = f"from .context import {self.name}"
+        functions.create_file(f"{self.tests}/test_basic.py", tests)
+        functions.create_file(f"{self.tests}/test_advanced.py", tests)
+
     def create_requirements(self):
         
         pip_freeze_command = f"{self.pip} freeze"
@@ -34,6 +67,19 @@ class PythonProject(Project):
             self.requirements = stdout
         with open('requirements.txt', "w") as requirements_file:
             requirements_file.write(self.requirements)
+
+    def install_packages(self, packages):
+        install_cmd = f"{self.pip} install {packages.join(' ')}"
+        print(f"Installing python packages {packages.join(', ')} and dependencies using {self.pip}")
+        stdout, stderr, returncode = functions.run_process(install_cmd)
+        if returncode == 0:
+            lines = stdout.split("\n")
+            print(lines[len(lines)-2])
+            return True
+        else:
+            print(stderr)
+            return False
+
 
 
 
@@ -45,18 +91,14 @@ class FlaskProject(PythonProject):
 
 
     def initialise_framework(self):
-        install_flask_command = f"{self.pip} install flask python-dotenv"
-        stdout, stderr, returncode = functions.run_process(install_flask_command)
-        if returncode == 0:
-            #print(install_flask_command)
-            lines = stdout.split("\n")
-            print(lines[len(lines)-2])
-
+        packages = ['flask', 'python-dotenv']
+        if self.install_packages(packages):
             self.initialise_app()
 
-
         else:
-            print(stderr)
+            print(f"Error installing packages {packages.join(', ')} and dependecies using pip.")
+            print(f"Try installing them manually using this command:\n")
+            print(f"{self.pip} install {packages.join(' ')}")
     
 
 
@@ -78,10 +120,11 @@ class FlaskProject(PythonProject):
                 file.close()
 
             print("Successfully generated flask project.\n")
+            print(f"Stored environment variable FLASK_APP={self.name}.py in {self.path}/.flaskenv\n")
             print("To activate the virtual environment run:\n")
-            print(f"cd {self.path} && source {self.env}/bin/activate")
+            print(f"cd {self.path} && source {self.env}/bin/activate\n")
             print("To start the development server, run:\n")
-            print("flask run")
+            print("flask run\n")
 
 
     
