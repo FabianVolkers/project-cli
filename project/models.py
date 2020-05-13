@@ -93,10 +93,11 @@ Name:\t\t {self.name}
             print(stderr)
     
     def push_file_to_remote(self, filename):
+        os.chdir(self.path)
         stdout, stderr, returncode = functions.run_process(f"git add {filename}")
         if returncode == 0:
             print(stdout)
-            stdout, stderr, returncode = functions.run_process(f"git commit -m '[project cli] generate readme'")
+            stdout, stderr, returncode = functions.run_process(f"git commit -m '[project cli] generate {filename}'")
             if returncode == 0:
                 print(stdout)
                 stdout, stderr, returncode = functions.run_process(f"git push {self.remote} {self.branch}")
@@ -117,10 +118,20 @@ Name:\t\t {self.name}
         
 
     def save_to_file(self):
-        with open('.project', 'w') as file:
+        with open(f'{self.path}/.project', 'w') as file:
             for attribute in self.__dict__.keys():
                 file.write(f"{attribute}={str(self.__dict__[attribute]).encode()}\n")
             file.close()
+    
+    def load_from_file(self):
+        attributes = []
+        with open(f'{self.path}/.project', 'r') as file:
+            attributes = file.readlines()
+            file.close()
+        
+        for attribute in attributes:
+            key, value = attribute.split("=")
+            setattr(self, key, value)
 
 
 if __name__ == "__main__":
