@@ -72,6 +72,9 @@ Supported Frameworks:
     
     add_language_subparser(frameworks, create_subparser)
 
+    load_parser = subparsers.add_parser('load', help='load from .project file')
+    load_parser.set_defaults(func=commands.load_project)
+
     add_documentation_subparser(subparsers)
 
     git_parser = subparsers.add_parser('git', help='git related commands')

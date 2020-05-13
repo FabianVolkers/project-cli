@@ -119,16 +119,14 @@ Name:\t\t {self.name}
 
     def save_to_file(self):
         with open(f'{self.path}/.project', 'w') as file:
+            file.write(f"class={self.__class__}\n")
+            newline_chr = "\n"
+            newline_str = "\\n"
             for attribute in self.__dict__.keys():
-                file.write(f"{attribute}={str(self.__dict__[attribute]).encode()}\n")
+                file.write(f"{attribute}={str(self.__dict__[attribute]).replace(newline_chr, newline_str)}\n")
             file.close()
     
-    def load_from_file(self):
-        attributes = []
-        with open(f'{self.path}/.project', 'r') as file:
-            attributes = file.readlines()
-            file.close()
-        
+    def load(self, attributes):    
         for attribute in attributes:
             key, value = attribute.split("=")
             setattr(self, key, value)

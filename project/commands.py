@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import project as base
-from project import frameworks, functions
+#TODO: figure out a way to have a generic create project function with all logic caught in classes
+from project import frameworks, functions, models
 
 def create_project(project_class, args):
     print(f"Initialising new {project_class.label} project")
@@ -20,7 +20,7 @@ def create_environment(project, framework):
 
 def create_base_project(args):
     print(f'creating project')
-    project = create_project(base.Project, args)
+    project = create_project(models.Project, args)
     
     
 def create_javascript_project(args):
@@ -45,7 +45,29 @@ def create_python_project(args):
     project = create_environment(project, framework)
     project.initialise_structure()
 
+def load_project(args):
+    try:
+        projectfile = args.projectfile
+    except AttributeError:
+        projectfile = ".project"
 
+    with open(projectfile) as file:
+            attributes = file.readlines()
+            file.close()
+    project_class_str = attributes[0].split("=")[1].split("'")[1].split(".")[2]
+    print(project_class_str)
+    if hasattr(frameworks.python, project_class_str):
+        project_class = getattr(frameworks.python, project_class_str)
+    elif hasattr(frameworks.javascript, project_class_str):
+        project_class = getattr(frameworks.javascript, project_class_str)
+    elif hasattr(models, project_class_str):
+        project_class = getattr(models, project_class_str)
+    else:
+        print("Project class not found")
+    name = attributes[1].split("=")[1]
+    project = project_class(name)
+    project.load(attributes)
+    print(project.__dict__)
 
 def git_function(args):
     print('git commands')
