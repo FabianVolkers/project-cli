@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os, sys, subprocess, inspect, re
-import commands
-import project as base
+import project.commands as commands
+import project.models as models
 
 """TODO: refactor every command to use subprocess"""
 def get_supported_frameworks(frameworks):
@@ -15,7 +15,7 @@ def get_supported_frameworks(frameworks):
                     language_name = name
                     create_func = f"create_{language_name}_project"
                     
-                    if str(class_obj) == str(base.Project):
+                    if str(class_obj) == str(models.Project):
                         language_name = "nolang"
                         create_func = "create_base_project"
 

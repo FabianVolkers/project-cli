@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from project import Project
+import project.models as models
 import os, sys, subprocess
 
-class JavaScriptProject(Project):
+class JavaScriptProject(models.Project):
     def __init__(self, name, language, framework):
         super().__init__(name, language, framework)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import project as base
-import frameworks, functions
+from project import frameworks, functions
 
 def create_project(project_class, args):
     print(f"Initialising new {project_class.label} project")

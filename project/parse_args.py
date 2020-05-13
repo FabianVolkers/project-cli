@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-import frameworks, functions, commands
+from project import frameworks, functions, commands
 import project as base
 
 

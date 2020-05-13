@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-from project import Project
-import functions
+#from .project import Project
+#from .project import Project
+#import project.project.Project
+import project.models as models
+import project.functions as functions
 import os, sys, subprocess
 
-class PythonProject(Project):
+class PythonProject(models.Project):
     def __init__(self, name, version=3):
         super().__init__(name)
         self.language = 'python'
