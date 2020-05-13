@@ -24,6 +24,7 @@ def get_supported_frameworks(frameworks):
                         supported_frameworks[f"{language_name}.{class_obj.label}"] = {
                             "class": class_obj,
                             "lang": language_name,
+                            "framework": class_obj.label,
                             "create_func": getattr(commands, create_func)
                         }
                     
