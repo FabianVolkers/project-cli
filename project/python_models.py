@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-#from .project import Project
-#from .project import Project
-#import project.project.Project
-import project.models as models
+""" import project.models as models
 import project.functions as functions
-import project.template as template
+import project.template as template """
+from project import models, functions, template
 import os, sys, subprocess
 
 class PythonProject(models.Project):
@@ -39,7 +37,7 @@ class PythonProject(models.Project):
                 path = f"{self.path}/{self.name}"
             else:
                 path = f"{self.path}/{section}"
-                
+
             setattr(self, section, path)
 
             os.mkdir(path)
@@ -61,8 +59,8 @@ class PythonProject(models.Project):
 
 
     def install_packages(self, packages):
-        install_cmd = f"{self.pip} install {packages.join(' ')}"
-        print(f"Installing python packages {packages.join(', ')} and dependencies using {self.pip}")
+        install_cmd = f"{self.pip} install {' '.join(packages)}"
+        print(f"Installing python packages {', '.join(packages)} and dependencies using {self.pip}")
         stdout, stderr, returncode = functions.run_process(install_cmd)
         if returncode == 0:
             lines = stdout.split("\n")
@@ -85,17 +83,17 @@ class FlaskProject(PythonProject):
     def initialise_framework(self):
         packages = ['flask', 'python-dotenv']
         if self.install_packages(packages):
-            self.initialise_app()
+            return True
 
         else:
-            print(f"Error installing packages {packages.join(', ')} and dependecies using pip.")
+            print(f"Error installing packages {', '.join(packages)} and dependecies using pip.")
             print(f"Try installing them manually using this command:\n")
-            print(f"{self.pip} install {packages.join(' ')}")
+            print(f"{self.pip} install {' '.join(packages)}")
     
 
 
 
-    def initialise_app(self):
+    def initialise_structure(self):
         self.app = "app"
         self.routes = "routes"
         self.app_dir = f"{self.path}/{self.app}"
@@ -110,12 +108,12 @@ class FlaskProject(PythonProject):
             functions.create_file(f"{self.path}/.flaskenv", f"FLASK_APP={self.name}.py")
 
 
-            print("Successfully generated flask project.\n")
-            print(f"Stored environment variable FLASK_APP={self.name}.py in {self.path}/.flaskenv\n")
-            print("To activate the virtual environment run:\n")
-            print(f"cd {self.path} && source {self.env}/bin/activate\n")
-            print("To start the development server, run:\n")
-            print("flask run\n")
+            print("\tSuccessfully generated flask project.\n")
+            print(f"\tStored environment variable FLASK_APP={self.name}.py in {self.path}/.flaskenv\n")
+            print("\tTo activate the virtual environment run:\n")
+            print(f"\tcd {self.path} && source {self.env}/bin/activate\n")
+            print("\tTo start the development server, run:\n")
+            print("\tflask run\n")
 
 
     
